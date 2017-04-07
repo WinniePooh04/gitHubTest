@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
 import com.mysql.jdbc.PreparedStatement;
 
 public class Practice1 {
@@ -29,6 +30,7 @@ public class Practice1 {
 		ResultSet rst = null;
 		ResultSet rstUpdate = null;
 		String cusInfo = m_customer.getCusInfo();
+		System.out.println(cusInfo);
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			// mysql connect
