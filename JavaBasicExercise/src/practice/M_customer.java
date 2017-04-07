@@ -93,6 +93,6 @@ public class M_customer {
 	}
 	
 	public String getCusInfo() {
-		return customer_name + '\n' + address;
+		return customer_name + '\n' + address + '\n' + tel;
 	}
 }
