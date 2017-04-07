@@ -29,6 +29,7 @@ public class Practice1 {
 		ResultSet rst = null;
 		ResultSet rstUpdate = null;
 		String cusInfo = m_customer.getCusInfo();
+		String test = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			// mysql connect
