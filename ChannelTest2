@@ -1,0 +1,27 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+	myChan := make(chan int, 2)
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	// Receive only channel
+	go func(ch <-chan int, wg *sync.WaitGroup) {
+		value, isOpen := <-ch
+		fmt.Println("isOpen Channel", isOpen)
+		fmt.Println("value", value)
+		wg.Done()
+	}(myChan, wg)
+	// Send only channel
+	go func(ch chan<- int, wg *sync.WaitGroup) {
+		myChan <- 5
+		close(myChan)
+		wg.Done()
+	}(myChan, wg)
+	wg.Wait()
+
+}
