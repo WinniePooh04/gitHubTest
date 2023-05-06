@@ -1,0 +1,32 @@
+package main
+
+import "fmt"
+
+func main() {
+	result := make(chan []string)
+
+	go func() {
+		words(3, result)
+		close(result)
+	}()
+	for v := range result {
+		for _, res := range v {
+			fmt.Printf("%s\n", res)
+		}
+	}
+
+	fmt.Println("got here")
+}
+func words(length int, result chan []string) {
+	if length < 1 {
+		return
+	}
+	var theArray []string
+	theArray = append(theArray, "India")
+	theArray = append(theArray, "Canada")
+	theArray = append(theArray, "Japan")
+
+	result <- theArray
+	words(length-1, result)
+
+}
