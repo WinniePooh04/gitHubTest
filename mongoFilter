@@ -1,0 +1,14 @@
+filters := bson.A{}
+
+queryFilters := bson.A{
+			bson.M{"geometry.coordinates.0": bson.M{"$gte": fttxBody.SWLat, "$lte": fttxBody.NELat}},
+			bson.M{"geometry.coordinates.1": bson.M{"$gte": fttxBody.SWLng, "$lte": fttxBody.NELng}},
+			bson.M{"properties.type": t},
+			bson.M{"properties.additional_info.display": "true"},
+			tagFilter,
+			connectionType,
+		}
+		filter := bson.M{"$and": queryFilters}
+		*filters = append(*filters, filter)
+
+mainFilter = bson.M{"$or": filters}
