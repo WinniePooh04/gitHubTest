@@ -1,0 +1,76 @@
+wg := &sync.WaitGroup{}
+			nodeCh := make(chan []mymongo.PointFeature)
+			go func() {
+				defer wg.Done()
+				defer close(nodeCh)
+				wg.Add(1)
+				ParentNodesRecursive(node[0].Properties.AdditionalInfo["parent_id"], nodeCh)
+			}()
+			wg.Wait()
+
+			// Read value from channel
+			for n := range nodeCh {
+				nodesList = append(nodesList, n...)
+			}
+
+func ParentNodesRecursive(parentId string, ch chan<- []mymongo.PointFeature) {
+	var pointFeature mymongo.PointFeature
+	if len(parentId) > 0 {
+		filter := bson.M{}
+		filter["properties.id"] = parentId
+		filter["properties.additional_info.display"] = "true"
+		point, err := pointFeature.GetALlPointFeatureswithFilter(filter, beego.AppConfig.String("mongodb::access_collection"))
+		if err != nil {
+			log.Println(err)
+		}
+
+		if len(point) > 0 {
+			ch <- point
+			ParentNodesRecursive(point[0].Properties.AdditionalInfo["parent_id"], ch)
+		}
+	}
+}
+
+/*** search child node recursive ****/
+ch := make(chan []mymongo.PointFeature)
+			go func() {
+				limitCh := make(chan struct{}, 4)
+				var wg sync.WaitGroup
+				for _, point := range childPoints {
+					limitCh <- struct{}{}
+					wg.Add(1)
+					go func(point mymongo.PointFeature) {
+						defer func() { <-limitCh }()
+						defer wg.Done()
+						ids := []string{point.Properties.Id}
+						ChildNodesRecursive(ids, ch)
+					}(point)
+				}
+				wg.Wait()
+				close(ch)
+			}()
+			// Read value from channel
+			for m := range ch {
+				nodesList = append(nodesList, m...)
+			}
+
+
+func ChildNodesRecursive(childIds []string, ch chan<- []mymongo.PointFeature) {
+	var pointFeature mymongo.PointFeature
+	var err error
+	filter := bson.M{}
+	filter["properties.additional_info.parent_id"] = bson.M{"$in": childIds}
+	filter["properties.additional_info.display"] = "true"
+	childPoints, err := pointFeature.GetALlPointFeatureswithFilter(filter, beego.AppConfig.String("mongodb::access_collection"))
+	if err != nil {
+		log.Println(err)
+	}
+	if len(childPoints) > 0 {
+		ch <- childPoints
+		var childIds []string
+		for _, point := range childPoints {
+			childIds = append(childIds, point.Properties.Id)
+		}
+		ChildNodesRecursive(childIds, ch)
+	}
+}
