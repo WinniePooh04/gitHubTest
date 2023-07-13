@@ -1,0 +1,32 @@
+package main
+
+import (
+	"fmt"
+	"log"
+)
+
+func main() {
+	var i int
+	ch := make(chan int, 4)
+	var intArry []int
+	go func() {
+		foo(&i, ch)
+		foo(&i, ch)
+		foo(&i, ch)
+		foo(&i, ch)
+		close(ch)
+	}()
+
+	for v := range ch {
+		intArry = append(intArry, v)
+		log.Println("length of model", len(intArry))
+		if len(intArry) == 3 {
+			fmt.Println("Hello, 世界", v)
+		}
+	}
+
+}
+func foo(i *int, ch chan<- int) {
+	*i = *i + 1
+	ch <- 1
+}
